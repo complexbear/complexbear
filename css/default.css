@@ -1,0 +1,50 @@
+<!-- default styles for complexbear -->
+
+html, body { 
+	width: 100%;
+    height: 100%;
+}
+
+html {
+	background: #c6baaa;
+}
+
+.bgimage {
+	background: #c6baaa;
+	background-repeat:no-repeat;	
+	position:absolute;
+	height:400px;
+	left:0;
+    width:98%;
+    display: block;    
+}
+
+#bear {	
+	background-image:url('../media/bear-small.jpg');	
+    top:0;
+}
+
+#monkey {
+	background-image:url('../media/monkey-small.jpg');	
+    bottom:0;
+}
+
+#active {
+	border-radius: 15px;
+	position: absolute;
+	top: 40px;
+	bottom: 40px;
+	left: 650px;
+	width: 50%;
+	height: 90%;
+}
+
+div.active {
+	background: #d3c6b5;
+}
+
+h1 { 
+	color: #333333; 
+	text-indent: 20px;
+	font: bold 30px/50px "Verdana", sans-serif;
+}
