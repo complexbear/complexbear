@@ -1,6 +1,5 @@
 ''' ComplexBear pubic API
 '''
-import db
 import sys
 import math
 import json
@@ -56,7 +55,7 @@ class Cmd(object):
 
     def process(self, func, data):
         f = getattr(self, func)
-        f(data)
+        return f(data)
 
     def loadContent(self, data):
         if self.validateToken(data):
@@ -77,13 +76,12 @@ class Cmd(object):
                 refToken = f.read()
                 valid = refToken == token
                 self.logger.info('token %s is valid = %s' %(token, valid))
-        except Exception, e:
+        except Exception as e:
             self.logger.exception(e)
         return token
         
-    def authenticate(self, data):
+    def authenticate(self, points):
         self.logger.info('authenticate')
-        points = json.loads(data)
         self.logger.debug(points)
         circle = Circle(points, 40)
         valid = circle.validate()
@@ -95,6 +93,5 @@ class Cmd(object):
         response['origin'] = circle.origin
         response['inner'] = circle.innerR
         response['outer'] = circle.outerR
-        result = json.dumps(response)
-        self.logger.debug(result)
-        return result
+        self.logger.debug(response)
+        return response

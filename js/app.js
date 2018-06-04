@@ -34,37 +34,47 @@ window.onload = function() {
 Server = (function() {
 	
 	var cls = function() {
-		this.path = '/blogserver';
+		this.path = '/blogserver/';
 		this.method = 'POST';
 	};
 	
-	cls.prototype = {
-			
-		authenticate: function(data) {
-			var req = new XMLHttpRequest(),
-				points = JSON.stringify(data),
-				formdata = new FormData();
+	cls.prototype = {			
+		authenticate: function(data, callback) {
 			try {
-				formdata.append('cmd','authenticate');
-				formdata.append('data',points);
+				var req = new XMLHttpRequest(),
+					reqData = {
+						'cmd': 'authenticate',
+						'data': data
+					};
 			
-				req.open(this.method, this.path, false);
-	            req.send(formdata);
-				if(req.responseText != '') return JSON.parse(req.responseText);
-			} catch (err) {
-				logger('ERROR: ' + err);
+				req.open(this.method, this.path);
+				req.setRequestHeader('Content-Type', 'application/json');
+				req.send(JSON.stringify(reqData));
+				req.onreadystatechange = function() {
+					if(req.status == 200 && req.responseText != '') {
+						let result = JSON.parse(req.responseText);
+						console.log(result);
+						callback(result);
+					} else {
+						callback(null);
+					}
+				};				
+			} catch (error) {
+				console.log(error);
+				callback(null);
 			}
-			return null;
 		},
 		
 		loadContent: function() {
 			var req = new XMLHttpRequest(),
-				formdata = new FormData();
-			formdata.append('cmd','loadContent');
-			formdata.append('data', server.token);
+				data = {
+					'cmd':'loadContent',
+					'data': server.token
+				};
 			req.open(this.method, this.path, false);
-			req.send(formdata);
-			if(req.responseText != '') eval(req.responseText);
+			req.send(data);
+			if(req.status == 200 && req.responseText != '') eval(req.responseText);
+			else console.log(req.responseText);
 		}
 	};
 	
@@ -120,28 +130,28 @@ Draw = (function() {
 		stop: function(event) {
 			logger('draw stop');
 			// Send points to server for verification
-			var self = this,
-			    result = server.authenticate(this.trace);
-			
-			if( result ) {
-				try {
-					this.context.strokeStyle = result.valid ? '#0a0' : '#a00';
-					this.context.beginPath();
-					this.context.arc(result.origin[0], result.origin[1], result.inner, 0, Math.PI*2, true);
-					this.context.stroke();
-					this.context.beginPath();
-					this.context.arc(result.origin[0], result.origin[1], result.outer, 0, Math.PI*2, true);
-					this.context.stroke();
-				} finally {
-					self.reset();
-					if( result.valid ) {
-						server.token = result.token;
-						server.loadContent();
+			var self = this;
+			server.authenticate(self.trace, function(result) {
+				if(result) {
+					try {
+						self.context.strokeStyle = result.valid ? '#0a0' : '#a00';
+						self.context.beginPath();
+						self.context.arc(result.origin[0], result.origin[1], result.inner, 0, Math.PI*2, true);
+						self.context.stroke();
+						self.context.beginPath();
+						self.context.arc(result.origin[0], result.origin[1], result.outer, 0, Math.PI*2, true);
+						self.context.stroke();
+					} finally {
+						self.reset();
+						if( result.valid ) {
+							server.token = result.token;
+							server.loadContent();
+						}
 					}
-				}				
-			} else {
-				self.reset();
-			}
+				} else {
+					self.reset();
+				}
+			});
 		},
 	
 		reset: function() {

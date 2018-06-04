@@ -2,40 +2,49 @@
 import sys
 import os
 import logging
-import cgi 
+from flask import Flask, jsonify, request
 
 location = os.path.dirname(os.path.realpath(__file__))
-
-logging.basicConfig(filename='/tmp/server.log')
-logging.getLogger().setLevel(logging.INFO)
-
 sys.path.append(location)
+
+logging.basicConfig(
+    format='%(asctime)s %(levelname)s\t- [%(name)s] %(message)s',
+    level='DEBUG', 
+    filename='/tmp/server.log'
+)
 logging.info('Py code location: ' + location)
 
-cmds = None
-try:
-    cmds = __import__('cmds')
-except Exception, e:
-    print 'failed to import cmds: %s' %e
+import cmds
 
-def application(environ, start_response):
+def blogserver():
     try:
-        METHOD = environ['REQUEST_METHOD']
-        
-        if METHOD == 'POST':
-            input = environ['wsgi.input']
-            environ.setdefault('QUERY_STRING', '')
-            postData = cgi.FieldStorage(fp=input,
-                          environ=environ,
-                          keep_blank_values=1)
-            logging.info(postData)
-            func = postData.getfirst('cmd',None)
-            logging.info('CMD = ' + func)
-            cmd = cmds.Cmd(environ['REMOTE_PORT'])
-            if cmd:
-                return cmd.process(func, postData['data'].value)
-            else:
-                return 'unknown cmd: %s' %func
-    except Exception, e:
+        post_data = request.get_json(silent=True)           
+        logging.info(request.data)     
+        func = post_data.get('cmd')
+        logging.info('CMD = ' + func)
+        cmd = cmds.Cmd(request.environ.get('REMOTE_PORT'))
+        if cmd:
+            return cmd.process(func, post_data['data'])
+        else:
+            return 'unknown cmd: {}'.format(func)
+    except Exception as e:
         logging.exception(e)
         return str(e)
+
+def application():
+    app = Flask(__name__)
+    # app.debug = True
+
+    @app.route('/', methods=['GET','POST'])
+    def handler():
+        try:
+            return jsonify(blogserver()), 200
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+    return app
+        
+if __name__ == '__main__':
+    app = application()
+    app.run(host='0.0.0.0', port=8000)
+        
