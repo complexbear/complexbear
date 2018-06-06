@@ -9,6 +9,10 @@ html {
 	background: #c6baaa;
 }
 
+iframe {
+	border: none;
+}
+
 .bgimage {
 	background: #c6baaa;
 	background-repeat:no-repeat;	
@@ -36,7 +40,7 @@ html {
 	bottom: 40px;
 	left: 650px;
 	width: 50%;
-	height: 90%;
+	height: 100%;
 }
 
 div.active {

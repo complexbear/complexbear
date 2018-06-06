@@ -51,12 +51,14 @@ Server = (function() {
 				req.setRequestHeader('Content-Type', 'application/json');
 				req.send(JSON.stringify(reqData));
 				req.onreadystatechange = function() {
-					if(req.status == 200 && req.responseText != '') {
-						let result = JSON.parse(req.responseText);
-						console.log(result);
-						callback(result);
-					} else {
-						callback(null);
+					if(req.readyState == 4) { // is done
+						if(req.status == 200 && req.responseText != '') {
+							let result = JSON.parse(req.responseText);
+							console.log(result);
+							callback(result);
+						} else {
+							callback(null);
+						}
 					}
 				};				
 			} catch (error) {
@@ -66,15 +68,17 @@ Server = (function() {
 		},
 		
 		loadContent: function() {
-			var req = new XMLHttpRequest(),
-				data = {
-					'cmd':'loadContent',
-					'data': server.token
-				};
-			req.open(this.method, this.path, false);
-			req.send(data);
-			if(req.status == 200 && req.responseText != '') eval(req.responseText);
-			else console.log(req.responseText);
+			// Replace the canvas with an iframe containing the blog
+			console.log('loading blog content');
+			var canvas = document.getElementById('canvas'),
+				parent = canvas.parentElement,
+				iframe = document.createElement('iframe');
+			iframe.width = canvas.width;
+			iframe.height = canvas.height;
+			iframe.src = window.location + '/blog?token=' + this.token;
+
+			parent.removeChild(canvas);
+			parent.appendChild(iframe);
 		}
 	};
 	
