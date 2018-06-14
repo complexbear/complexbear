@@ -79,12 +79,15 @@ Server = (function() {
 			var canvas = document.getElementById('canvas'),
 				parent = canvas.parentElement,
 				iframe = document.createElement('iframe');
-			iframe.width = canvas.width;
-			iframe.height = canvas.height;
+			iframe.width = parent.width;
+			iframe.height = parent.height;
 			iframe.src = window.location + '/blog?token=' + this.token;
 
 			parent.removeChild(canvas);
 			parent.appendChild(iframe);
+
+			parent.removeEventListener('onmouseover');
+			parent.removeEventListener('onmouseout');
 		}
 	};
 	
