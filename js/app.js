@@ -27,6 +27,12 @@ window.onload = function() {
 	draw = new Draw();
 	server = new Server();
 	blog = null;
+
+	// For touch devices
+	let c = document.getElementById('canvas');
+	c.touchstart = function(e) { draw.start(e); };
+	c.touchstop = function(e) { draw.stop(e); };
+	c.touchmove = function(e) { draw.draw(e); };
 };
 
 
