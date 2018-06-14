@@ -29,10 +29,22 @@ window.onload = function() {
 	blog = null;
 
 	// For touch devices
-	let c = document.getElementById('canvas');
-	c.touchstart = function(e) { draw.start(e); };
-	c.touchstop = function(e) { draw.stop(e); };
-	c.touchmove = function(e) { draw.draw(e); };
+	if( navigator.userAgent.match(/Android/i)
+	|| navigator.userAgent.match(/webOS/i)
+	|| navigator.userAgent.match(/iPhone/i)
+	|| navigator.userAgent.match(/iPad/i)
+	|| navigator.userAgent.match(/iPod/i)
+	|| navigator.userAgent.match(/BlackBerry/i)
+	|| navigator.userAgent.match(/Windows Phone/i) )
+	{
+		let a = document.getElementById('active'),
+			c = document.getElementById('canvas');
+		a.className = 'active';
+		c.touchstart = function(e) { draw.start(e); };
+		c.touchstop = function(e) { draw.stop(e); };
+		c.touchmove = function(e) { draw.draw(e); };
+		console.log('mobile device detected: ' + navigator.userAgent);
+	}	
 };
 
 
@@ -66,7 +78,7 @@ Server = (function() {
 							callback(null);
 						}
 					}
-				};				
+				};
 			} catch (error) {
 				console.log(error);
 				callback(null);
@@ -79,12 +91,12 @@ Server = (function() {
 			var canvas = document.getElementById('canvas'),
 				parent = canvas.parentElement,
 				iframe = document.createElement('iframe');
-			iframe.width = parent.width;
-			iframe.height = parent.height;
+			iframe.width = canvas.width;
+			iframe.height = canvas.height;
 			iframe.src = window.location + '/blog?token=' + this.token;
 
-			parent.removeChild(canvas);
 			parent.appendChild(iframe);
+			parent.removeChild(canvas);
 
 			parent.removeEventListener('onmouseover');
 			parent.removeEventListener('onmouseout');
