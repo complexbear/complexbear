@@ -37,13 +37,8 @@ window.onload = function() {
 	|| navigator.userAgent.match(/BlackBerry/i)
 	|| navigator.userAgent.match(/Windows Phone/i) )
 	{
-		let a = document.getElementById('active'),
-			c = document.getElementById('canvas');
-		a.className = 'active';
-		c.touchstart = function(e) { draw.start(e); };
-		c.touchstop = function(e) { draw.stop(e); };
-		c.touchmove = function(e) { draw.draw(e); };
-		console.log('mobile device detected: ' + navigator.userAgent);
+		// Just load the blog until I figure out touch events
+		server.loadContent();
 	}	
 };
 
