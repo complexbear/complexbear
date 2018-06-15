@@ -86,15 +86,15 @@ Server = (function() {
 			var canvas = document.getElementById('canvas'),
 				parent = canvas.parentElement,
 				iframe = document.createElement('iframe');
-			iframe.width = canvas.width;
-			iframe.height = canvas.height;
+			iframe.width = parent.clientWidth;
+			iframe.height = parent.clientHeight;
 			iframe.src = window.location + '/blog?token=' + this.token;
 
-			parent.appendChild(iframe);
+			parent.onmouseover = null;
+			parent.onmouseout = null;
+			activearea(false);
 			parent.removeChild(canvas);
-
-			parent.removeEventListener('onmouseover');
-			parent.removeEventListener('onmouseout');
+			parent.appendChild(iframe);
 		}
 	};
 	
